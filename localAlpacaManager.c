@@ -58,6 +58,7 @@ int main() {
                 printf("Which of these categories does the context belong to?: ");
                 scanf("%d", &selectDir);
                 getchar();
+                selectDir--;
                 char fileContent[MAX_CONTXT_CHAR];
                 int fileIndex;
                 for (int i = 0; i < MAX_FILES; i++) {
@@ -69,9 +70,12 @@ int main() {
                 printf("Type in name of text file: ");
                 fgets(dirArr[selectDir].fileTitle[fileIndex], sizeof(dirArr[selectDir].fileTitle[fileIndex]), stdin);
                 dirArr[selectDir].fileTitle[fileIndex][strcspn(dirArr[selectDir].fileTitle[fileIndex], "\n")] = '\0';
+
+                char filePath[MAX_TITLE_CHAR + MAX_TITLE_CHAR + 2];
+                snprintf(filePath, sizeof(filePath), "%s/%s", dirArr[selectDir].dirTitle, dirArr[selectDir].fileTitle[fileIndex]);
                 
                 FILE *fptr;
-                fptr = fopen(dirArr[selectDir].fileTitle[fileIndex], "w");
+                fptr = fopen(filePath, "w");
                 if (fptr == NULL) {
                     printf("Error creating file.\n");
                     return 1;
