@@ -12,7 +12,7 @@
     #define MKDIR(path) mkdir(path, 0777)
 #endif
 
-#define MAX_DIR 50
+#define MAX_DIR 10
 #define MAX_CONTXT_CHAR 5000
 
 int main() {
@@ -46,13 +46,28 @@ int main() {
                 break;
 
             case(2):
-                char fileName[MAX_TITLE_CHAR];
+                int selectDir;
+                for (int i = 0; i < MAX_DIR; i++) {
+                    if (dirArr[i].dirTitle[0] != '\0') {
+                        printf("%s[%d]\n", dirArr[i].dirTitle, i + 1);
+                    }
+                }
+
+                printf("Which of these categories does the context belong to?: ");
+                scanf("%d", &selectDir);
                 char fileContent[MAX_CONTXT_CHAR];
+                int fileIndex;
+                for (int i = 0; i < MAX_FILES; i++) {
+                    if (*dirArr[selectDir].fileTitle[i] != '\0') {
+                        fileIndex = i;
+                        break;
+                    }
+                }
                 printf("Type in name of text file: ");
-                scanf("%s", fileName);
+                fgets(dirArr[selectDir].fileTitle[fileIndex], sizeof(dirArr[selectDir].fileTitle[fileIndex]), stdin);
                 
                 FILE *fptr;
-                fptr = fopen(fileName, "w");
+                fptr = fopen(dirArr[selectDir].fileTitle[fileIndex], "w");
                 if (fptr == NULL) {
                     printf("Error creating file.\n");
                     return 1;
@@ -68,7 +83,7 @@ int main() {
                 }
                 
                 fclose(fptr);
-                printf("File '%s' created.\n", fileName);
+                printf("File '%s' created.\n", dirArr[selectDir].fileTitle[fileIndex]);
                 break;
 
             default:
