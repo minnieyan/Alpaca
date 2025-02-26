@@ -22,6 +22,7 @@ int main() {
     do {
         printf("Enter 1 to create a category, enter 2 to create a file, enter 3 to exit program: ");
         scanf("%d", &whatDo);
+        getchar();
 
         switch (whatDo) {
             case (1):
@@ -33,6 +34,7 @@ int main() {
                         if (dirArr[i].dirTitle[0] == '\0') {
                             printf("Type in name of directory: ");
                             fgets(dirArr[i].dirTitle, sizeof(dirArr[i].dirTitle), stdin);
+                            dirArr[i].dirTitle[strcspn(dirArr[i].dirTitle, "\n")] = '\0';
                             if (MKDIR(dirArr[i].dirTitle) == 0) {
                                 printf("Directory '%s' created successfully.\n", dirArr[i].dirTitle);
                                 break;
@@ -55,16 +57,18 @@ int main() {
 
                 printf("Which of these categories does the context belong to?: ");
                 scanf("%d", &selectDir);
+                getchar();
                 char fileContent[MAX_CONTXT_CHAR];
                 int fileIndex;
                 for (int i = 0; i < MAX_FILES; i++) {
-                    if (*dirArr[selectDir].fileTitle[i] != '\0') {
+                    if (dirArr[selectDir].fileTitle[i][0] == '\0') {
                         fileIndex = i;
                         break;
                     }
                 }
                 printf("Type in name of text file: ");
                 fgets(dirArr[selectDir].fileTitle[fileIndex], sizeof(dirArr[selectDir].fileTitle[fileIndex]), stdin);
+                dirArr[selectDir].fileTitle[fileIndex][strcspn(dirArr[selectDir].fileTitle[fileIndex], "\n")] = '\0';
                 
                 FILE *fptr;
                 fptr = fopen(dirArr[selectDir].fileTitle[fileIndex], "w");
