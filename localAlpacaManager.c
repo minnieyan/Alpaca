@@ -80,7 +80,7 @@ int main() {
                     printf("Invalid category index entered. Please only enter a category listed.\n");
                     break;
                 } else {
-                    char fileContent[MAX_CONTXT_CHAR];
+                    char fileContent[MAX_CONTXT_CHAR + 1]; //+ 1 to include null terminator.
                     int fileIndex;
                     for (int i = 0; i < MAX_FILES; i++) {
                         if (dirArr[selectDir].fileTitle[i][0] == '\0') { //Seeks the first available file by checking if a title already exists, then indexes it.
@@ -92,7 +92,7 @@ int main() {
                     fgets(dirArr[selectDir].fileTitle[fileIndex], sizeof(dirArr[selectDir].fileTitle[fileIndex]), stdin);
                     dirArr[selectDir].fileTitle[fileIndex][strcspn(dirArr[selectDir].fileTitle[fileIndex], "\n")] = '\0'; //Removes new line.
 
-                    char filePath[MAX_TITLE_CHAR + MAX_TITLE_CHAR + 2];
+                    char filePath[2*MAX_TITLE_CHAR + 2]; //An array large enough to store the directory path for file creation.
                     snprintf(filePath, sizeof(filePath), "%s/%s", dirArr[selectDir].dirTitle, dirArr[selectDir].fileTitle[fileIndex]); //Creates path for file creation.
                     
                     //Creates file and writes in user specified input. Returns error if unable to.
