@@ -1,5 +1,5 @@
 //Xi Ting Yan wrote this program.
-//Ali Kutay Dastan wrote the program that interfaces with Ollama. It was not included in the submission because it is not yet implemented.
+//Ali Kutay Dastan wrote the program that interfaces with Ollama. (The shell scripts included in this submission.)
 //Tahmeed Ahmed helped with debugging and error handling.
 //Ashkan Sharifi is working on improving the program is that pre-existing directories will be automatically indexed upon program start-up.
 //This program takes user input to create directories and files with the specified titles and contents.
@@ -123,7 +123,7 @@ int main() {
         }
     } while (whatDo == 1 || whatDo == 2);
 
-    //By default, program will exist if user input is neither 1 nor 2.
+    //By default, program will exit if user input is neither 1 nor 2.
 
     return 0;
 }
