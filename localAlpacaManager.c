@@ -1,14 +1,11 @@
 #include <stdio.h>
 #include <sys/stat.h>
-#include <sys/types.h>
 #include <string.h>
 #include "contextStructs.h"
 
 #ifdef _WIN32
-    #include <windows.h>
-    #define MKDIR(path) _mkdir(path)
+    #define MKDIR(path) mkdir(path)
 #else
-    #include <unistd.h>
     #define MKDIR(path) mkdir(path, 0777)
 #endif
 
@@ -18,6 +15,9 @@
 int main() {
     int whatDo;
     struct contextDir dirArr[MAX_DIR];
+    for (int i = 0; i < MAX_DIR; i++) {
+        dirArr[i].dirTitle[0] = 0;
+    }
 
     do {
         printf("Enter 1 to create a category, enter 2 to create a file, enter 3 to exit program: ");
@@ -32,7 +32,7 @@ int main() {
                 } else {
                     for (int i = 0; i < MAX_DIR; i++) {
                         if (dirArr[i].dirTitle[0] == '\0') {
-                            printf("Type in name of directory: ");
+                            printf("Type in name of category: ");
                             fgets(dirArr[i].dirTitle, sizeof(dirArr[i].dirTitle), stdin);
                             dirArr[i].dirTitle[strcspn(dirArr[i].dirTitle, "\n")] = '\0';
                             if (MKDIR(dirArr[i].dirTitle) == 0) {
@@ -40,7 +40,7 @@ int main() {
                                 break;
                             } else {
                                 printf("Error creating directory, directory may already exist.\n");
-                                return 1;
+                                break;
                             }
                         }
                     }
@@ -59,39 +59,44 @@ int main() {
                 scanf("%d", &selectDir);
                 getchar();
                 selectDir--;
-                char fileContent[MAX_CONTXT_CHAR];
-                int fileIndex;
-                for (int i = 0; i < MAX_FILES; i++) {
-                    if (dirArr[selectDir].fileTitle[i][0] == '\0') {
-                        fileIndex = i;
+                if (dirArr[selectDir].dirTitle[0] == '\0' || selectDir < 0 || selectDir > MAX_DIR - 1) {
+                    printf("Invalid category index entered. Please only enter a category listed.\n");
+                    break;
+                } else {
+                    char fileContent[MAX_CONTXT_CHAR];
+                    int fileIndex;
+                    for (int i = 0; i < MAX_FILES; i++) {
+                        if (dirArr[selectDir].fileTitle[i][0] == '\0') {
+                            fileIndex = i;
+                            break;
+                        }
+                    }
+                    printf("Type in name of text file: ");
+                    fgets(dirArr[selectDir].fileTitle[fileIndex], sizeof(dirArr[selectDir].fileTitle[fileIndex]), stdin);
+                    dirArr[selectDir].fileTitle[fileIndex][strcspn(dirArr[selectDir].fileTitle[fileIndex], "\n")] = '\0';
+
+                    char filePath[MAX_TITLE_CHAR + MAX_TITLE_CHAR + 2];
+                    snprintf(filePath, sizeof(filePath), "%s/%s", dirArr[selectDir].dirTitle, dirArr[selectDir].fileTitle[fileIndex]);
+                    
+                    FILE *fptr;
+                    fptr = fopen(filePath, "w");
+                    if (fptr == NULL) {
+                        printf("Error creating file.\n");
                         break;
                     }
-                }
-                printf("Type in name of text file: ");
-                fgets(dirArr[selectDir].fileTitle[fileIndex], sizeof(dirArr[selectDir].fileTitle[fileIndex]), stdin);
-                dirArr[selectDir].fileTitle[fileIndex][strcspn(dirArr[selectDir].fileTitle[fileIndex], "\n")] = '\0';
+                    printf("Type in the contents of the file (Type in END to stop):\n");
 
-                char filePath[MAX_TITLE_CHAR + MAX_TITLE_CHAR + 2];
-                snprintf(filePath, sizeof(filePath), "%s/%s", dirArr[selectDir].dirTitle, dirArr[selectDir].fileTitle[fileIndex]);
-                
-                FILE *fptr;
-                fptr = fopen(filePath, "w");
-                if (fptr == NULL) {
-                    printf("Error creating file.\n");
-                    return 1;
-                }
-                printf("Type in the contents of the file (Type in END to stop):\n");
-
-                while (1) {
-                    fgets(fileContent, sizeof(fileContent), stdin);
-                    if (strncmp(fileContent, "END", 3) == 0) {
-                        break;
+                    while (1) {
+                        fgets(fileContent, sizeof(fileContent), stdin);
+                        if (strncmp(fileContent, "END", 3) == 0) {
+                            break;
+                        }
+                        fprintf(fptr, "%s", fileContent);
                     }
-                    fprintf(fptr, "%s", fileContent);
+                    
+                    fclose(fptr);
+                    printf("File '%s' created.\n", dirArr[selectDir].fileTitle[fileIndex]);
                 }
-                
-                fclose(fptr);
-                printf("File '%s' created.\n", dirArr[selectDir].fileTitle[fileIndex]);
                 break;
 
             default:
