@@ -33,7 +33,7 @@ void createDir(struct contextDir dirArr[MAX_DIR]) {
     }
 }
 
-int createFile(struct contextDir dirArr[MAX_DIR]) {
+void createFile(struct contextDir dirArr[MAX_DIR]) {
     int selectDir;
     for (int i = 0; i < MAX_DIR; i++) {
         if (dirArr[i].dirTitle[0] != '\0') {
@@ -46,7 +46,7 @@ int createFile(struct contextDir dirArr[MAX_DIR]) {
     selectDir--;
     if (dirArr[selectDir].dirTitle[0] == '\0' || selectDir < 0 || selectDir > MAX_DIR - 1) {
         printf("Invalid category index entered. Please only enter a category listed.\n");
-        return -1;
+        return;
     } else {
         char fileContent[MAX_CONTXT_CHAR + 1];
         int fileIndex;
@@ -65,7 +65,7 @@ int createFile(struct contextDir dirArr[MAX_DIR]) {
         fptr = fopen(filePath, "w");
         if (fptr == NULL) {
             printf("Error creating file.\n");
-            return -1;
+            return;
         }
         printf("Type in the contents of the file (Type in END to stop):\n");
         while (1) {
@@ -77,6 +77,6 @@ int createFile(struct contextDir dirArr[MAX_DIR]) {
         }
         fclose(fptr);
         printf("File '%s' created.\n", dirArr[selectDir].fileTitle[fileIndex]);
-        return 0;
+        return;
     }
 }
