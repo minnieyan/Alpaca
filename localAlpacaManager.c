@@ -19,24 +19,28 @@ int main() {
 
     do {
         //Inquires the user what they wish to do.
-        printf("Enter 1 to create a category, enter 2 to create a file, enter 3 to exit program: ");
+        printf("Menu Options (Enter number to select option):\n1. Create Directory\n2. Create File\n0. Exit Program\n");
         scanf("%d", &whatDo);
         getchar();
 
         switch (whatDo) {
-            case (1):
+            case 1:
                 createDir(dirArr);
                 break;
 
-            case(2):
+            case 2:
                 createFile(dirArr);
                 break;
 
-            default:
+            case 0:
                 printf("Exiting Program.\n");
                 break;
+            
+            default:
+                printf("Please enter a valid input according to the menu options.\n");
+                break;
         }
-    } while (whatDo == 1 || whatDo == 2);
+    } while (whatDo != 0);
 
     return 0;
 }
