@@ -8,6 +8,9 @@
 
 //These libraries include all the functions used by this program.
 #include <stdio.h>
+#include <dirent.h>
+#include <sys/stat.h>
+#include <string.h>
 #include "alpacaFunctions.h"
 
 int main() {
@@ -17,9 +20,30 @@ int main() {
         dirArr[i].dirTitle[0] = 0;
     }
 
+    struct dirent* dent;
+    struct stat st;
+
+    DIR *dir = opendir("./");
+    if (dir == NULL) {
+        printf("Error indexing directories.\n");
+        return 1;
+    }
+
+    int dirIndex = 0;
+    while ((dent = readdir(dir)) != NULL) {
+        if (stat(dent->d_name, &st) == 0) {
+            if (S_ISDIR(st.st_mode)) {
+                strncpy(dirArr[dirIndex].dirTitle, dent->d_name, sizeof(dirArr[dirIndex].dirTitle) - 1);
+            }
+        } else {
+            printf("Error verifying pre-existing directories.\n");
+        } 
+        dirIndex++;
+    }
+
     do {
         //Inquires the user what they wish to do.
-        printf("Menu Options (Enter number to select option):\n1. Create Directory\n2. Create File\n0. Exit Program\n");
+        printf("Menu Options (Enter number to select option):\n1. Create Directory\n2. Create File\n0. Exit Program\nEnter your selection: ");
         scanf("%d", &whatDo);
         getchar();
 
