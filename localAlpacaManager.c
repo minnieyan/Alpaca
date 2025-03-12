@@ -30,10 +30,13 @@ int main() {
     }
 
     int dirIndex = 0;
+    char prevDir[] = {'.', '.'};
     while ((dent = readdir(dir)) != NULL) {
         if (stat(dent->d_name, &st) == 0) {
             if (S_ISDIR(st.st_mode)) {
-                strncpy(dirArr[dirIndex].dirTitle, dent->d_name, sizeof(dirArr[dirIndex].dirTitle) - 1);
+                if (dent->d_name[0] != '.' && strcmp(dent->d_name, prevDir) != 0) {
+                    strncpy(dirArr[dirIndex].dirTitle, dent->d_name, sizeof(dirArr[dirIndex].dirTitle) - 1);
+                }
             }
         } else {
             printf("Error verifying pre-existing directories.\n");
