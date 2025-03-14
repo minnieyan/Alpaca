@@ -16,7 +16,7 @@ int indexDir(struct dirStruct dirArr[MAX_DIR]) {
 
     DIR *dir = opendir("./");
     if (dir == NULL) {
-        printf("Error indexing directories.\n");
+        printf("Error indexing directories.\n\n");
         return 1;
     }
 
@@ -31,7 +31,7 @@ int indexDir(struct dirStruct dirArr[MAX_DIR]) {
                 }
             }
         } else {
-            printf("Error verifying pre-existing directories.\n");
+            printf("Error verifying pre-existing directories.\n\n");
             return 1;
         } 
     }
@@ -40,7 +40,7 @@ int indexDir(struct dirStruct dirArr[MAX_DIR]) {
 
 void createDir(struct dirStruct dirArr[MAX_DIR]) {
     if (dirArr[MAX_DIR - 1].dirTitle[0] != '\0') {
-        printf("You have reached the maximum amount of directories. (%d)\n", MAX_DIR);
+        printf("You have reached the maximum amount of directories. (%d)\n\n", MAX_DIR);
     } else {
         for (int i = 0; i < MAX_DIR; i++) {
             if (dirArr[i].dirTitle[0] == '\0') {
@@ -48,10 +48,10 @@ void createDir(struct dirStruct dirArr[MAX_DIR]) {
                 fgets(dirArr[i].dirTitle, sizeof(dirArr[i].dirTitle), stdin);
                 dirArr[i].dirTitle[strcspn(dirArr[i].dirTitle, "\n")] = '\0';
                 if (MKDIR(dirArr[i].dirTitle) == 0) {
-                    printf("Directory '%s' created successfully.\n", dirArr[i].dirTitle);
+                    printf("Directory '%s' created successfully.\n\n", dirArr[i].dirTitle);
                     break;
                 } else {
-                    printf("Error creating directory, directory may already exist.\n");
+                    printf("Error creating directory, directory may already exist.\n\n");
                     dirArr[i].dirTitle[0] = 0;
                     break;
                 }
@@ -60,23 +60,33 @@ void createDir(struct dirStruct dirArr[MAX_DIR]) {
     }
 }
 
-void listDir(struct dirStruct dirArr[MAX_DIR]) {
+int listDir(struct dirStruct dirArr[MAX_DIR]) {
+    int dirExist = 0;
     for (int i = 0; i < MAX_DIR; i++) {
         if (dirArr[i].dirTitle[0] != '\0') {
             printf("%s[%d]\n", dirArr[i].dirTitle, i + 1);
+            dirExist = 1;
         }
+    }
+    if (dirExist == 1) {
+        return 0;
+    } else {
+        return 1;
     }
 }
 
 void createFile(struct dirStruct dirArr[MAX_DIR]) {
-    listDir(dirArr);
+    if (listDir(dirArr) != 0) {
+        printf("No directories exist. Please create one before creating a file.\n\n");
+        return;
+    }
     int selectDir;
     printf("Which of these directories does the file belong to?: ");
     scanf("%d", &selectDir);
     getchar();
     selectDir--;
     if (dirArr[selectDir].dirTitle[0] == '\0' || selectDir < 0 || selectDir > MAX_DIR - 1) {
-        printf("Invalid directory index entered. Please only enter a directory listed.\n");
+        printf("Invalid directory index entered. Please only enter a directory listed.\n\n");
         return;
     } else {
         char fileContent[MAX_CONTENT_CHAR + 1];
@@ -95,7 +105,7 @@ void createFile(struct dirStruct dirArr[MAX_DIR]) {
         FILE *fptr;
         fptr = fopen(filePath, "w");
         if (fptr == NULL) {
-            printf("Error creating file.\n");
+            printf("Error creating file.\n\n");
             return;
         }
         printf("Type in the contents of the file (Type in END to stop):\n");
@@ -107,7 +117,7 @@ void createFile(struct dirStruct dirArr[MAX_DIR]) {
             fprintf(fptr, "%s", fileContent);
         }
         fclose(fptr);
-        printf("File '%s' created.\n", dirArr[selectDir].fileTitle[fileIndex]);
+        printf("File '%s' created.\n\n", dirArr[selectDir].fileTitle[fileIndex]);
         return;
     }
 }

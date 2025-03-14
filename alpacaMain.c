@@ -21,6 +21,8 @@ int main() {
         return 1;
     }
 
+    printf("Alpaca: Ollama Assistant\n\n");
+
     do {
         //Inquires the user what they wish to do.
         printf("Menu Options (Enter number to select option):\n1. Create Directory\n2. Create File\n3. List Directories\n0. Exit Program\nEnter your selection: ");
@@ -37,16 +39,19 @@ int main() {
                 break;
 
             case 3:
-                listDir(dirArr);
-                printf("End of directory list.\n");
+                if (listDir(dirArr) == 0) {
+                    printf("End of directory list.\n\n");
+                } else {
+                    printf("No directories exist.\n\n");
+                }
                 break;
 
             case 0:
-                printf("Exiting Program.\n");
+                printf("Exiting Program.\n\n");
                 break;
             
             default:
-                printf("Please enter a valid input according to the menu options.\n");
+                printf("Please enter a valid input according to the menu options.\n\n");
                 break;
         }
     } while (whatDo != 0);
