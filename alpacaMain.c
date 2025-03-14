@@ -23,7 +23,7 @@ int main() {
 
     do {
         //Inquires the user what they wish to do.
-        printf("Menu Options (Enter number to select option):\n1. Create Directory\n2. Create File\n0. Exit Program\nEnter your selection: ");
+        printf("Menu Options (Enter number to select option):\n1. Create Directory\n2. Create File\n3. List Directories\n0. Exit Program\nEnter your selection: ");
         scanf("%d", &whatDo);
         getchar();
 
@@ -34,6 +34,11 @@ int main() {
 
             case 2:
                 createFile(dirArr);
+                break;
+
+            case 3:
+                listDir(dirArr);
+                printf("End of directory list.\n");
                 break;
 
             case 0:

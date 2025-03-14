@@ -60,13 +60,17 @@ void createDir(struct dirStruct dirArr[MAX_DIR]) {
     }
 }
 
-void createFile(struct dirStruct dirArr[MAX_DIR]) {
-    int selectDir;
-    for (int i = 0; i < MAX_DIR; i++) {
+void listDir(struct dirStruct dirArr[MAX_DIR]) {
+    for (int i = 0; i < MAX_DIR - 1; i++) {
         if (dirArr[i].dirTitle[0] != '\0') {
             printf("%s[%d]\n", dirArr[i].dirTitle, i + 1);
         }
     }
+}
+
+void createFile(struct dirStruct dirArr[MAX_DIR]) {
+    listDir(dirArr);
+    int selectDir;
     printf("Which of these directories does the file belong to?: ");
     scanf("%d", &selectDir);
     getchar();
