@@ -61,7 +61,7 @@ void createDir(struct dirStruct dirArr[MAX_DIR]) {
 }
 
 void listDir(struct dirStruct dirArr[MAX_DIR]) {
-    for (int i = 0; i < MAX_DIR - 1; i++) {
+    for (int i = 0; i < MAX_DIR; i++) {
         if (dirArr[i].dirTitle[0] != '\0') {
             printf("%s[%d]\n", dirArr[i].dirTitle, i + 1);
         }
