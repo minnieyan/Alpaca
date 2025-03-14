@@ -23,6 +23,7 @@ void createDir(struct contextDir dirArr[MAX_DIR]) {
                     break;
                 } else {
                     printf("Error creating directory, directory may already exist.\n");
+                    dirArr[i].dirTitle[0] = 0;
                     break;
                 }
             }
