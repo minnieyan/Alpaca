@@ -8,9 +8,6 @@
 
 //These libraries include all the functions used by this program.
 #include <stdio.h>
-#include <dirent.h>
-#include <sys/stat.h>
-#include <string.h>
 #include "alpacaLocal.h"
 
 int main() {
