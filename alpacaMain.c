@@ -1,27 +1,31 @@
 // Xi Ting Yan wrote this program.
-// Ali Kutay Dastan wrote the program that interfaces with Ollama. He also designed the repository that was used for this project.
+// Ali Kutay Dastan wrote the program that interfaces with Ollama, was responsible for version control, and designed the repository that was used for this project.
 // Tahmeed Ahmed is responsible for debugging and error handling.
-// Ashkan Sharifi *PLACEHOLDER*
+// Ashkan Sharifi is responsible for implementing a feature to print contents of files into the program.l   
 // This program takes user input to create directories and files with the specified titles and contents.
 // Compile alpacaMain.c with alpacaLocal.c in the same directory as alpacaLocal.h and dirStruct.h.
 // The final goal of project Alpaca is to implement data streaming from Ollama into this program to create local files that store Ollama context.
 // Ollama is an open-source software that allows local running of LLMs.
 
-// These libraries include all the functions used by this file.
-#include <stdio.h> // Required for printf() and scanf().
-#include "alpacaLocal.h" // Contains declaration for functions used and defined maximums.
+#include <stdio.h>
+#include "alpacaOllama.h"
 
 // The main program uses functions defined in alpacaLocal.c.
 int main() {
-    // whatDo will be used to store user's request for what they wish to do.
-    // An array called dirArr is initialized to contain the directory structs the program will use.
+    // whatDo stores user request for function.
+    // dirArr is an array of structs, with each struct representing a directory.
     int whatDo;
     struct dirStruct dirArr[MAX_DIR];
-    // This fills the first character of each directory title with 0.
-    // We do this to ensure the other functions work correctly.
-    // Other functions will check if the first character in a directory title is 0 to determine if the directory exists.
+
+    // Functions called later will check if dirTitle[0] is NULL as a means of verifying if it has been initialized.
     for (int i = 0; i < MAX_DIR; i++) {
-        dirArr[i].dirTitle[0] = 0;
+        dirArr[i].dirTitle[0] = '\0';
+    }
+
+    for (int i = 0; i < MAX_DIR; i++) {
+        for (int x = 0; x < MAX_FILES; x++) {
+            dirArr[i].fileTitle[x][0] = '\0';
+        }
     }
 
     // This function indexes existing directories in the same directory as the program. See alpacaLocal.c.
@@ -30,24 +34,32 @@ int main() {
         return 1;
     }
 
-    // Initialization message, will only print once upon successful initialization of program.
-    printf("Alpaca: Ollama Assistant\n\n");
+    printf("\n--- Alpaca: Ollama Assistant ---\n\n");
 
     do {
-        // Inquires the user what they wish to do. User input will determine next steps.
-        printf("Menu Options (Enter number to select option):\n1. Create Directory\n2. Create File\n3. List Directories\n0. Exit Program\nEnter your selection: ");
+        // Menu options displyed.
+        printf("Menu Options: \n");
+        printf("1. List Available Models\n");
+        printf("2. Create Context Category\n");
+        printf("3. List Categories\n");
+        printf("4. Chat with Model\n");
+        printf("0. Exit Alpaca\n");
         scanf("%d", &whatDo);
-        getchar(); // Some functions uses fgets(), this getchar(); is to protect from overflow into fgets().
+        getchar(); // Buffer overflow protection for fgets() in called functions.
 
         switch (whatDo) {
             case 1:
                 // This function creates a directory, see alpacaLocal.c for definition and error messages.
-                createDir(dirArr);
+                if (system("ollama list") != 0) {
+                    printf("No models found.\n");
+                } else {
+                    printf("End of list of models.\n");
+                }
                 break;
 
             case 2:
                 // This function creates a file, see alpacaLocal.c for definition and error messages.
-                createFile(dirArr);
+                createDir(dirArr);
                 break;
 
             case 3:
@@ -60,18 +72,31 @@ int main() {
                 }
                 break;
 
+            case 4:
+                if (system("ollama list") != 0) {
+                    printf("No models found.\n");
+                    break;
+                } else {
+                    char modelName[MAX_MODEL_NAME];
+                    printf("Type in the selected model name: ");
+                    fgets(modelName, sizeof(modelName), stdin);
+                    if (chatWithOllama(modelName, dirArr) == 1) {
+                        break;
+                    }
+                }
+                break;
+
             case 0:
-                // This is the only way the user can terminate the program gracefully.
                 printf("Exiting Program.\n\n");
                 break;
             
             default:
-                // Validation of user input. If user inputs invalid input undefined by menu, this message will print.
+                // Input validation.
                 printf("Please enter a valid input according to the menu options.\n\n");
                 break;
         }
 
-    // Loop terminates upon user requesting to exit program.
+    // Program terminates at user request.
     } while (whatDo != 0);
 
     return 0;
