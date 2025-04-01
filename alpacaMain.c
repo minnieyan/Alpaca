@@ -47,7 +47,8 @@ int main() {
         printf("2. Create Context Category\n");
         printf("3. List Categories\n");
         printf("4. List Context Files\n");
-        printf("5. Chat with Model\n");
+        printf("5. Print Context File\n");
+        printf("6. Chat with Model\n");
         printf("0. Exit Alpaca\n");
         scanf("%d", &whatDo);
         getchar(); // Buffer overflow protection for fgets() in called functions.
@@ -56,9 +57,9 @@ int main() {
             case 1:
                 // This function creates a directory, see alpacaLocal.c for definition and error messages.
                 if (system("ollama list") != 0) {
-                    printf("No models found.\n");
+                    printf("No models found.\n\n");
                 } else {
-                    printf("End of list of models.\n");
+                    printf("End of list of models.\n\n");
                 }
                 break;
 
@@ -92,8 +93,12 @@ int main() {
                     printf("No categories exist.\n\n");
                 }
                 break;
-                
+
             case 5:
+                printFileContent(dirArr);
+                break;
+                
+            case 6:
                 if (system("ollama list") != 0) {
                     printf("No models found.\n");
                     break;

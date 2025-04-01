@@ -230,3 +230,56 @@ int createFile(struct dirStruct dirArr[MAX_DIR], char response[MAX_RESPONSE]) {
         return 0;
     }
 }
+
+int printFileContent(struct dirStruct dirArr[MAX_DIR]) {
+    int dirIndex, fileIndex;
+
+    if (listDir(dirArr) == 1) {
+        printf("No categories exist.\n\n");
+        return 1;
+    }
+
+    printf("Select a directory: ");
+    scanf("%d", &dirIndex);
+    getchar();
+    dirIndex--;
+
+    if (dirIndex < 0 || dirIndex >= MAX_DIR || dirArr[dirIndex].dirTitle[0] == '\0') {
+        printf("Invalid directory selected.\n\n");
+        return 1;
+    }
+
+    if (listFile(dirArr, dirIndex) == 1) {
+        printf("No files in this category.\n\n");
+        return 1;
+    }
+
+    printf("Select a file: ");
+    scanf("%d", &fileIndex);
+    getchar();
+    fileIndex--;
+
+    if (fileIndex < 0 || fileIndex >= MAX_FILES || dirArr[dirIndex].fileTitle[fileIndex][0] == '\0') {
+        printf("Invalid file selected.\n\n");
+        return 1;
+    }
+
+    char filePath[2 * MAX_TITLE_CHAR + 2];
+    snprintf(filePath, sizeof(filePath), "%s/%s", dirArr[dirIndex].dirTitle, dirArr[dirIndex].fileTitle[fileIndex]);
+
+    FILE *fptr = fopen(filePath, "r");
+    if (fptr == NULL) {
+        printf("Error opening file.\n\n");
+        return 1;
+    }
+
+    printf("\n--- File Contents: '%s' ---\n\n", dirArr[dirIndex].fileTitle[fileIndex]);
+    char ch;
+    while ((ch = fgetc(fptr)) != EOF) {
+        putchar(ch);
+    }
+    printf("\n\n--- End of File ---\n\n");
+
+    fclose(fptr);
+    return 0;
+}
