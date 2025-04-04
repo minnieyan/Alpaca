@@ -8,8 +8,6 @@
 // Compile alpacaMain.c, alpacaLocal.c, and alpacaInteraction.c in the same directory as alpacaLocal.h, dirStruct.h, and alpacaInteraction.h.
 // Ollama is an open-source software that allows local running of LLMs.
 
-// DO NOT COMPILE WITH interaction.c, the interaction.c and interaction.h files. These files are simply submitted as a WIP
-
 #include <stdio.h>
 #include <stdlib.h>
 // Header file alpacaLocal.h contains declaration of all functions that interact with local directories/files.
