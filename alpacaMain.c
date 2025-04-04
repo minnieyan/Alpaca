@@ -1,15 +1,22 @@
-// Xi Ting Yan wrote this program.
-// Ali Kutay Dastan wrote the program that interfaces with Ollama, was responsible for version control, and designed the repository that was used for this project.
+// Xi Ting Yan and Ali Kutay Dastan wrote the main program.
+// Ali Kutay Dastan wrote all functions in alpacaInteraction.c.
+// Xi Ting Yan wrote all functions in alpacaLocal.c except for the printFileContent() function.
 // Tahmeed Ahmed is responsible for debugging and error handling.
-// Ashkan Sharifi is responsible for implementing a feature to print contents of files into the program.
-// This program takes user input to create directories and files with the specified titles and contents.
-// Compile alpacaMain.c with alpacaLocal.c in the same directory as alpacaLocal.h and dirStruct.h.
-// The final goal of project Alpaca is to implement data streaming from Ollama into this program to create local files that store Ollama context.
+// Ashkan Sharifi implemented the function that permits the printing of text from a selected context file. (printFileContent())
+// This program allows a user to interact with an LLM via Ollama and preserve context files.
+// It also allows the user to manage context files.
+// Compile alpacaMain.c, alpacaLocal.c, and alpacaInteraction.c in the same directory as alpacaLocal.h, dirStruct.h, and alpacaInteraction.h.
 // Ollama is an open-source software that allows local running of LLMs.
+
+// DO NOT COMPILE WITH interaction.c, the interaction.c and interaction.h files. These files are simply submitted as a WIP
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "alpacaOllama.h"
+// Header file alpacaLocal.h contains declaration of all functions that interact with local directories/files.
+#include "alpacaLocal.h"
+// Header file to include functionalities that communicate with Ollama                                                                                              
+#include "alpacaInteraction.h"
+
 
 // The main program uses functions defined in alpacaLocal.c.
 int main() {
@@ -23,6 +30,7 @@ int main() {
         dirArr[i].dirTitle[0] = '\0';
     }
 
+    // The above comment applies to files too.
     for (int i = 0; i < MAX_DIR; i++) {
         for (int x = 0; x < MAX_FILES; x++) {
             dirArr[i].fileTitle[x][0] = '\0';
@@ -43,13 +51,15 @@ int main() {
 
     do {
         // Menu options displyed.
+        // Currently option 6 is temporarily disabled until it can be properly implemented, the option is simply here for reference purposes.
         printf("Menu Options: \n");
         printf("1. List Available Models\n");
         printf("2. Create Context Category\n");
         printf("3. List Categories\n");
         printf("4. List Context Files\n");
         printf("5. Print Context File\n");
-        printf("6. Chat with Model\n");
+        printf("6. Chat with Model and Save to File\n");
+        printf("7. Upload a Text File to Ollama\n");
         printf("0. Exit Alpaca\n\n");
         printf("Enter your selection: ");
         scanf("%d", &whatDo);
@@ -64,19 +74,26 @@ int main() {
                 } else {
                     printf("End of list of models.\n\n");
                 }
+                printf("Press any button to continue...\n");
+                getchar();
                 break;
 
             case 2:
                 // This function creates a file, see alpacaLocal.c for definition and error messages.
                 createDir(dirArr);
+                printf("Press any button to continue...\n");
+                getchar();
                 break;
 
             case 3:
                 // This function prints all indexed directories, see alpacaLocal.c for definition.
                 // Function return 0 after successful execution. Returns 1 if no indexed directories exist.
                 listDir(dirArr);
+                printf("Press any button to continue...\n");
+                getchar();
                 break;
 
+            // This allows a user to specify a directory, and a file within said directory to return the title of.
             case 4:
                 int dirSelect = 0;
                 if (listDir(dirArr) == 0) {
@@ -89,25 +106,30 @@ int main() {
                         listFile(dirArr, dirSelect);
                     }
                 }
+                printf("Press any button to continue...\n");
+                getchar();
                 break;
 
+            // This function prints the contents of a user specified context file.
             case 5:
                 printFileContent(dirArr);
+                printf("Press any button to continue...\n");
+                getchar();
+                break;
+
+            // This function will prompt the user on which model they want to chat with and also ask which .txt file the user wants to save the conversation
+            case 6:
+                chatWithModelToFile(dirArr);  
+                printf("Press any button to continue...\n");
+                getchar();
+                break;
+            // This function will upload an existing .txt file into a desired model 
+            case 7:
+                uploadFileToOllama(dirArr);  
+                printf("Press any button to continue...\n");
+                getchar();
                 break;
                 
-            case 6:
-                if (system("ollama list") != 0) {
-                    printf("No models found.\n");
-                    break;
-                } else {
-                    char modelName[MAX_MODEL_NAME];
-                    printf("Type in the selected model name: ");
-                    fgets(modelName, sizeof(modelName), stdin);
-                    if (chatWithOllama(modelName, dirArr) == 1) {
-                        break;
-                    }
-                }
-                break;
 
             case 0:
                 printf("Exiting Program.\n\n");
@@ -116,10 +138,12 @@ int main() {
             default:
                 // Input validation.
                 printf("Please enter a valid input according to the menu options.\n\n");
+                printf("Press any button to continue...\n");
+                getchar();
                 break;
         }
 
-    // Program terminates at user request.
+    // Program terminates only at user request.
     } while (whatDo != 0);
 
     return 0;

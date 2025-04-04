@@ -4,7 +4,7 @@
 #include <string.h>
 #include <dirent.h>
 #include <unistd.h>
-#include "alpacaOllama.h"
+#include "alpacaLocal.h"
 
 // Defines function for directory creation based on user platform.
 #ifdef _WIN32
@@ -13,6 +13,8 @@
     #define MKDIR(path) mkdir(path, 0777)
 #endif
 
+// This function was written by Xi Ting Yan.
+// This function is called during the initialization of the program to store context file information in the struct.
 int indexFile(struct dirStruct dirArr[MAX_DIR]) {
 
     for (int i = 0; i < MAX_DIR; i++) {
@@ -26,6 +28,7 @@ int indexFile(struct dirStruct dirArr[MAX_DIR]) {
 
             DIR *fptr = opendir(dirPath);
 
+            // Prints error message if the function fails to open the specified directory.
             if (fptr == NULL) {
                 printf("Error indexing files.\n\n");
                 return 1;
@@ -34,18 +37,22 @@ int indexFile(struct dirStruct dirArr[MAX_DIR]) {
             int fileIndex = 0;
 
             while ((fileent = readdir(fptr)) != NULL) {
-                char filePath[MAX_TITLE_CHAR*2 + 4];
+                                                     // MAX_TITLE_CHAR*2 allows for a path large enough to store the maximum sized file and directory names.
+                char filePath[MAX_TITLE_CHAR*2 + 4]; // + 4 allows for the './' from dirPath, a null terminator, and the path seperator '/'.
                 snprintf(filePath, sizeof(filePath), "%s/%s", dirPath, fileent->d_name);
                 if (stat(filePath, &filest) == 0) {
+                    // If the file is not a regular file, it is disregarded, and the loop continues to the next iteration.
                     if (!S_ISREG(filest.st_mode)) {
                         continue;
                     }
+                    // The current and parent directory are excluded.
                     if (strcmp(fileent->d_name, ".") == 0 || strcmp(fileent->d_name, "..") == 0) {
                         continue;
                     }
                     strncpy(dirArr[dirIndex].fileTitle[fileIndex], fileent->d_name, sizeof(dirArr[dirIndex].fileTitle[fileIndex]) - 1);
-                    fileIndex++;
+                    fileIndex++; // Cycles to the next index number.
                 } else {
+                    // Prints error message of function fails to get information on the file.
                     printf("Error indexing pre-existing files.\n\n");
                     return 1;
                 }
@@ -56,6 +63,7 @@ int indexFile(struct dirStruct dirArr[MAX_DIR]) {
     return 0;
 }
 
+// This function was written by Xi Ting Yan.
 // This function indexes all directories that exist in the same directory as the program.
 int indexDir(struct dirStruct dirArr[MAX_DIR]) {
 
@@ -71,21 +79,22 @@ int indexDir(struct dirStruct dirArr[MAX_DIR]) {
     }
 
     int dirIndex = 0;
-    char prevDir[] = {'.', '.'}; // This would be the directory name of the preceding directory.
 
     // Reads all files/directories until there are none left.
     while ((dirent = readdir(dptr)) != NULL) {
         if (stat(dirent->d_name, &st) == 0) {
             // We use stat functions to ensure only directories will be indexed.
-            if (S_ISDIR(st.st_mode)) {
-                // This prevents the current directory and the previous directory from being indexed.
-                if (dirent->d_name[0] != '.' && strcmp(dirent->d_name, prevDir) != 0) {
-                    // We -1 from the amount of memory allocated or the title to preserve the null terminator.
-                    strncpy(dirArr[dirIndex].dirTitle, dirent->d_name, sizeof(dirArr[dirIndex].dirTitle) - 1);
-                    // The function increments dirIndex to move to the next directory in the directory struct.
-                    dirIndex++;
-                }
+            if (!S_ISDIR(st.st_mode)) {
+                continue;
             }
+            // This prevents the current directory and the previous directory from being indexed.
+            if (strcmp(dirent->d_name, ".") == 0 || strcmp(dirent->d_name, "..") == 0) {
+                continue;
+            }
+            // We -1 from the amount of memory allocated or the title to preserve the null terminator.
+            strncpy(dirArr[dirIndex].dirTitle, dirent->d_name, sizeof(dirArr[dirIndex].dirTitle) - 1);
+                    // The function increments dirIndex to move to the next directory in the directory struct.
+            dirIndex++;
 
         // The function prints an error message and return 1 if there was an error with stat() that caused it to return non-0.
         // Otherwise the function returns 0 upon successful execution.
@@ -97,6 +106,7 @@ int indexDir(struct dirStruct dirArr[MAX_DIR]) {
     return 0;
 }
 
+// This function was written by Xi Ting Yan.
 // This function creates a new directory in the same directory as the program, with user input as the name.
 void createDir(struct dirStruct dirArr[MAX_DIR]) {
     // Checks if the maximum amount of directories already exists. Prints error message of so.
@@ -132,6 +142,7 @@ void createDir(struct dirStruct dirArr[MAX_DIR]) {
     }
 }
 
+// This function was written by Xi Ting Yan.
 // This function prints all the indexed directories. Note that it DOES NOT scan and re-indexes directories, but simply prints what is already indexed.
 int listDir(struct dirStruct dirArr[MAX_DIR]) {
     int dirExist = 0;
@@ -153,15 +164,19 @@ int listDir(struct dirStruct dirArr[MAX_DIR]) {
     }
 }
 
+
+// This function was written by Xi Ting Yan.
+// This function lists the names of all the files in a user specified directory.
 int listFile(struct dirStruct dirArr[MAX_DIR], int dirIndex) {
     int fileExist = 0;
     printf("\n--- List of Files in %s ---\n\n", dirArr[dirIndex].dirTitle);
     for (int i = 0; i < MAX_FILES; i++) {
         if (dirArr[dirIndex].fileTitle[i][0] != '\0') {
-            printf("%s[%d]\n", dirArr[dirIndex].fileTitle[i], i + 1);
+            printf("%s[%d]\n", dirArr[dirIndex].fileTitle[i], i + 1); // i + 1 because the user will read the file names 1-indexed.
             fileExist = 1;
         }
     }
+    // Function will check if any file names were printed, and will print a message accordingly.
     if (fileExist == 1) {
         printf("\n--- End of File List ---\n\n");
         return 0;
@@ -171,6 +186,7 @@ int listFile(struct dirStruct dirArr[MAX_DIR], int dirIndex) {
     }
 }
 
+// This function was written by Xi Ting Yan.
 // This function creates a text file in the user-specified directory with the user-specified title and content.
 int createFile(struct dirStruct dirArr[MAX_DIR], char response[MAX_RESPONSE]) {
     
@@ -236,6 +252,8 @@ int createFile(struct dirStruct dirArr[MAX_DIR], char response[MAX_RESPONSE]) {
     }
 }
 
+// This function was written by Ashkan Sharifi.
+// This function prints the contents of a user specified context file.
 int printFileContent(struct dirStruct dirArr[MAX_DIR]) {
     int dirIndex, fileIndex;
 
@@ -246,7 +264,7 @@ int printFileContent(struct dirStruct dirArr[MAX_DIR]) {
     printf("Select a directory: ");
     scanf("%d", &dirIndex);
     getchar();
-    dirIndex--;
+    dirIndex--; // User input will be 1-indexed, however, arrays are 0-indexed. We decrement dirIndex so that the correct directory is selected.
 
     if (dirIndex < 0 || dirIndex >= MAX_DIR || dirArr[dirIndex].dirTitle[0] == '\0') {
         printf("Invalid directory selected.\n\n");
@@ -260,8 +278,9 @@ int printFileContent(struct dirStruct dirArr[MAX_DIR]) {
     printf("Select a file: ");
     scanf("%d", &fileIndex);
     getchar();
-    fileIndex--;
+    fileIndex--; // User input will be 1-indexed, however, arrays are 0-indexed. We decrement fileIndex so that the correct file is selected.
 
+    // Function will return an error message if the file selected is invalid.
     if (fileIndex < 0 || fileIndex >= MAX_FILES || dirArr[dirIndex].fileTitle[fileIndex][0] == '\0') {
         printf("Invalid file selected.\n\n");
         return 1;
@@ -270,6 +289,7 @@ int printFileContent(struct dirStruct dirArr[MAX_DIR]) {
     char filePath[2 * MAX_TITLE_CHAR + 2];
     snprintf(filePath, sizeof(filePath), "%s/%s", dirArr[dirIndex].dirTitle, dirArr[dirIndex].fileTitle[fileIndex]);
 
+    // Function will return an error message if it fails to read the file specified.
     FILE *fptr = fopen(filePath, "r");
     if (fptr == NULL) {
         printf("Error opening file.\n\n");
